@@ -1,43 +1,26 @@
 from datetime import datetime, timezone
-from nexus_core.analysis.churn import analyze_churn_by_segment
-from nexus_core.reasoning.state import (
-    InvestigationTask,
-    TaskResult,
-    TaskStatus,
-    WorkerState,
-    TaskType
-)
 
 from nexus_core.analysis.churn import (
     analyze_churn_by_segment_evidence,
 )
-
+from nexus_core.analysis.product_changes import (
+    analyze_churn_by_product_changes_evidence,
+)
 from nexus_core.analysis.router import resolve_analysis
 from nexus_core.analysis.satisfaction import (
     analyze_churn_by_satisfaction_evidence,
 )
-from nexus_core.analysis.product_changes import (
-    analyze_churn_by_product_changes_evidence,
-)
-
-from nexus_core.analysis.router import resolve_analysis
-
-from nexus_core.analysis.churn import (
-    analyze_churn_by_segment_evidence,
-)
-
-from nexus_core.analysis.satisfaction import (
-    analyze_churn_by_satisfaction_evidence,
-)
-
-from nexus_core.analysis.product_changes import (
-    analyze_churn_by_product_changes_evidence,
-)
-
 from nexus_core.analysis.temporal import (
     analyze_churn_by_quarter_evidence,
 )
 
+from nexus_core.reasoning.state import (
+    InvestigationTask,
+    TaskResult,
+    TaskStatus,
+    TaskType,
+    WorkerState,
+)
 
 def execute_task(task: InvestigationTask) -> TaskResult:
     started_at = datetime.now(timezone.utc)
@@ -75,6 +58,17 @@ def execute_task(task: InvestigationTask) -> TaskResult:
                 evidence=evidence,
             )
 
+        if task.type == TaskType.ROOT_CAUSE:
+            raise ValueError(
+                "ROOT_CAUSE tasks are handled by the root_cause "
+                "graph node, not the task executor."
+            )
+
+        if task.type == TaskType.EVIDENCE_GATHERING:
+            raise ValueError(
+                "EVIDENCE_GATHERING is not currently supported."
+            )
+
         raise NotImplementedError(
             f"Task type {task.type.value} is not implemented yet."
         )
@@ -88,7 +82,6 @@ def execute_task(task: InvestigationTask) -> TaskResult:
             completed_at=datetime.now(timezone.utc),
             evidence=[],
         )
-        
 
 def worker_node(state: WorkerState) -> dict:
     result = execute_task(state["task"])

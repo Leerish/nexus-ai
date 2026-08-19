@@ -11,5 +11,6 @@ if __name__ == "__main__":
         }
     )
 
-    print("\nFINAL STATE")
-    print(result)
+    print("\nFINAL REPORT")
+    print("=" * 80)
+    print(result["report"])

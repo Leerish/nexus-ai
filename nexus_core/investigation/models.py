@@ -3,7 +3,7 @@ from enum import Enum
 from uuid import UUID, uuid4
 
 from sqlalchemy import DateTime, Enum as SQLEnum, Float, String, func
-from sqlalchemy.dialects.postgresql import UUID as PGUUID
+from sqlalchemy.dialects.postgresql import JSONB, UUID as PGUUID
 from sqlalchemy.orm import Mapped, mapped_column
 
 from nexus_core.database.base import Base
@@ -56,6 +56,11 @@ class Investigation(Base):
         Float,
         nullable=True,
     )
+    
+    result: Mapped[dict | None] = mapped_column(
+        JSONB,
+        nullable=True,
+    )
 
     created_at: Mapped[datetime] = mapped_column(
         DateTime(timezone=True),
@@ -72,3 +77,5 @@ class Investigation(Base):
         DateTime(timezone=True),
         nullable=True,
     )
+    
+    

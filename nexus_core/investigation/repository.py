@@ -3,9 +3,9 @@ from uuid import UUID
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from nexus_core.investigation.models import Investigation
+from nexus_core.investigation.models import Investigation , InvestigationStatus
 from nexus_core.investigation.schemas import InvestigationCreate
-
+from datetime import datetime, timezone
 
 def create_investigation(
     db: Session,
@@ -32,3 +32,19 @@ def get_investigation(
     )
 
     return db.scalar(statement)
+
+def update_investigation_result(
+    db: Session,
+    investigation: Investigation,
+    result: dict,
+    confidence_score: float | None = None,
+) -> Investigation:
+    investigation.result = result
+    investigation.confidence_score = confidence_score
+    investigation.status = InvestigationStatus.COMPLETED
+    investigation.completed_at = datetime.now(timezone.utc)
+
+    db.commit()
+    db.refresh(investigation)
+
+    return investigation

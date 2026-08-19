@@ -23,7 +23,7 @@ class InvestigationResponse(BaseModel):
     created_at: datetime
     started_at: datetime | None
     completed_at: datetime | None
-
+    result: dict | None
     model_config = {
         "from_attributes": True
     }

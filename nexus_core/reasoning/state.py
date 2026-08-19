@@ -5,7 +5,7 @@ from uuid import UUID , uuid4
 
 from pydantic import BaseModel, Field
 
-from datetime import datetime, timezone
+from datetime import datetime
 
 from typing import Any
 
@@ -66,3 +66,85 @@ class WorkerState(TypedDict):
     task: InvestigationTask
     
         
+class InvestigationFinding(BaseModel):
+    cause: str
+    explanation: str
+    supporting_evidence: list[Evidence] = Field(default_factory=list)
+    confidence: float = Field(
+        ge=0.0,
+        le=1.0,
+    )
+
+class ClaimStatus(StrEnum):
+    SUPPORTED = "supported"
+    CONFLICTING = "conflicting"
+    INSUFFICIENT_EVIDENCE = "insufficient_evidence"
+    NOT_APPLICABLE = "not_applicable"
+
+
+class ClaimAssessment(BaseModel):
+    claim: str
+
+    observed_value: float | None = None
+
+    observed_unit: str | None = None
+
+    status: ClaimStatus
+
+    explanation: str
+
+    evidence_indices: list[int] = Field(
+        default_factory=list
+    )
+
+    confidence: float = Field(
+        ge=0.0,
+        le=1.0,
+    )
+
+
+class InvestigationConclusion(BaseModel):
+    summary: str
+
+    findings: list[InvestigationFinding] = Field(
+        default_factory=list
+    )
+
+    claim_assessment: ClaimAssessment | None = None
+    
+class RootCauseCandidate(BaseModel):
+    cause: str
+    explanation: str
+    evidence_indices: list[int] = Field(default_factory=list)
+    confidence: float = Field(
+        ge=0.0,
+        le=1.0,
+    )
+    causal_status: str
+
+
+class RootCauseAnalysis(BaseModel):
+    root_causes: list[RootCauseCandidate] = Field(
+        default_factory=list
+    )
+    limitations: list[str] = Field(
+        default_factory=list
+    )
+
+    
+class InvestigationState(TypedDict):
+    investigation_id: str
+    question: str
+    tasks: list[InvestigationTask]
+    results: list[TaskResult]
+    conclusion: InvestigationConclusion | None
+    root_cause_analysis: RootCauseAnalysis | None
+    
+class InvestigationState(TypedDict):
+    investigation_id: str
+    question: str
+    tasks: list[InvestigationTask]
+    results: list[TaskResult]
+    conclusion: InvestigationConclusion | None
+    root_cause_analysis: RootCauseAnalysis | None
+    report: str | None
