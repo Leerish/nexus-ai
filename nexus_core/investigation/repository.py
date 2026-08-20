@@ -48,3 +48,16 @@ def update_investigation_result(
     db.refresh(investigation)
 
     return investigation
+
+def list_investigations(
+    db: Session,
+    limit: int = 20,
+) -> list[Investigation]:
+
+    statement = (
+        select(Investigation)
+        .order_by(Investigation.created_at.desc())
+        .limit(limit)
+    )
+
+    return list(db.scalars(statement).all())

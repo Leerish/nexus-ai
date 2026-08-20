@@ -27,3 +27,16 @@ class InvestigationResponse(BaseModel):
     model_config = {
         "from_attributes": True
     }
+    
+
+class InvestigationListResponse(BaseModel):
+    id: UUID
+    question: str
+    status: InvestigationStatus
+    priority: InvestigationPriority
+    confidence_score: float | None
+    created_at: datetime
+
+    model_config = {
+        "from_attributes": True
+    }
